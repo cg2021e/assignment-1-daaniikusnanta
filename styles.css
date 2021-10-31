@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+body {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    color: #144931;
+}
+
+body {
+    background-color: #FEFAF5;
+}
+
+.button {
+    align-items: center;
+}
+
+canvas {
+    border: 4px solid #F0E2B6;
+    background-color: #F0E2B6;
+    border-radius: 16px;
+}
+
+button {
+    width: 100px;
+    height: 40px;
+    margin-top: 15px;
+    border-radius: 25px;
+    font-size: large;
+    background-color: #715B06;
+}
+
+button {
+    color: #F8F2DC;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+}
