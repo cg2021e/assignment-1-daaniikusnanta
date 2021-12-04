@@ -2,6 +2,9 @@
 
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-f059dc9a6f8d3a56e377f745f24479a46679e63a5d9fe6f495e02850cd0d8118.svg)](https://classroom.github.com/online_ide?assignment_repo_id=5665432&assignment_repo_type=AssignmentRepo)
 
+## Result
+The result of this assignment can be viewed in [in this page](https://cg2021e.github.io/assignment-1-daaniikusnanta/).
+
 ## Top Front
 ![IMG_20210921_162935_279](https://user-images.githubusercontent.com/59066363/134148942-6ae3d477-cbc2-495d-81c4-9cad3edcb47d.jpg)
 ## Top Right
