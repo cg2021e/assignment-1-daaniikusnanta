@@ -3,184 +3,193 @@ function main() {
     var canvas = document.getElementById('myCanvas');   // The paper
     var gl = canvas.getContext('webgl');                // The brush and the paints
 
+    //Color
+    function color(r, g, b) {
+        return [r/255, g/255, b/255];
+    };
+
+    var white = [1.0, 1.0, 1.0];
+    var brown = [...color(53, 39, 19)];
+    var beige = [...color(110, 89, 58)];
+    var creme = [...color(230, 216, 170)];
+
     // Define vertices data consisting of position and color properties
+    var verticesBox = [
+        // Face A       // Red      // Surface orientation (normal vector)
+        -0.1, -0.1, -0.1,     ...white,    0, 0, -1,   // Index:  0    
+         0.1, -0.1, -0.1,     ...white,    0, 0, -1,   // Index:  1
+         0.1,  0.1, -0.1,     ...white,    0, 0, -1,   // Index:  2
+        -0.1,  0.1, -0.1,     ...white,    0, 0, -1,   // Index:  3
+        // Face B       // Yellow
+        -0.1, -0.1,  0.1,     ...white,    0, 0, 1,    // Index:  4
+         0.1, -0.1,  0.1,     ...white,    0, 0, 1,    // Index:  5
+         0.1,  0.1,  0.1,     ...white,    0, 0, 1,    // Index:  6
+        -0.1,  0.1,  0.1,     ...white,    0, 0, 1,    // Index:  7
+        // Face C       // Green
+        -0.1, -0.1, -0.1,     ...white,    -1, 0, 0,   // Index:  8
+        -0.1,  0.1, -0.1,     ...white,    -1, 0, 0,   // Index:  9
+        -0.1,  0.1,  0.1,     ...white,    -1, 0, 0,   // Index: 10
+        -0.1, -0.1,  0.1,     ...white,    -1, 0, 0,   // Index: 11
+        // Face D       // Blue
+         0.1, -0.1, -0.1,     ...white,    1, 0, 0,    // Index: 12
+         0.1,  0.1, -0.1,     ...white,    1, 0, 0,    // Index: 13
+         0.1,  0.1,  0.1,     ...white,    1, 0, 0,    // Index: 14
+         0.1, -0.1,  0.1,     ...white,    1, 0, 0,    // Index: 15
+        // Face E       // Orange
+        -0.1, -0.1, -0.1,     ...white,    0, -1, 0,   // Index: 16
+        -0.1, -0.1,  0.1,     ...white,    0, -1, 0,   // Index: 17
+         0.1, -0.1,  0.1,     ...white,    0, -1, 0,   // Index: 18
+         0.1, -0.1, -0.1,     ...white,    0, -1, 0,   // Index: 19
+        // Face F       // White
+        -0.1,  0.1, -0.1,     ...white,    0, 1, 0,    // Index: 20
+        -0.1,  0.1,  0.1,     ...white,    0, 1, 0,    // Index: 21
+         0.1,  0.1,  0.1,     ...white,    0, 1, 0,    // Index: 22
+         0.1,  0.1, -0.1,     ...white,    0, 1, 0     // Index: 23
+    ];
 
-    // var vertices = [
-    //     // Face A       // Red      // Surface orientation (normal vector)
-    //     -1, -1, -1,     1, 0, 0,    0, 0, -1,   // Index:  0    
-    //      1, -1, -1,     1, 0, 0,    0, 0, -1,   // Index:  1
-    //      1,  1, -1,     1, 0, 0,    0, 0, -1,   // Index:  2
-    //     -1,  1, -1,     1, 0, 0,    0, 0, -1,   // Index:  3
-    //     // Face B       // Yellow
-    //     -1, -1,  1,     1, 1, 0,    0, 0, 1,    // Index:  4
-    //      1, -1,  1,     1, 1, 0,    0, 0, 1,    // Index:  5
-    //      1,  1,  1,     1, 1, 0,    0, 0, 1,    // Index:  6
-    //     -1,  1,  1,     1, 1, 0,    0, 0, 1,    // Index:  7
-    //     // Face C       // Green
-    //     -1, -1, -1,     0, 1, 0,    -1, 0, 0,   // Index:  8
-    //     -1,  1, -1,     0, 1, 0,    -1, 0, 0,   // Index:  9
-    //     -1,  1,  1,     0, 1, 0,    -1, 0, 0,   // Index: 10
-    //     -1, -1,  1,     0, 1, 0,    -1, 0, 0,   // Index: 11
-    //     // Face D       // Blue
-    //      1, -1, -1,     0, 0, 1,    1, 0, 0,    // Index: 12
-    //      1,  1, -1,     0, 0, 1,    1, 0, 0,    // Index: 13
-    //      1,  1,  1,     0, 0, 1,    1, 0, 0,    // Index: 14
-    //      1, -1,  1,     0, 0, 1,    1, 0, 0,    // Index: 15
-    //     // Face E       // Orange
-    //     -1, -1, -1,     1, 0.5, 0,  0, -1, 0,   // Index: 16
-    //     -1, -1,  1,     1, 0.5, 0,  0, -1, 0,   // Index: 17
-    //      1, -1,  1,     1, 0.5, 0,  0, -1, 0,   // Index: 18
-    //      1, -1, -1,     1, 0.5, 0,  0, -1, 0,   // Index: 19
-    //     // Face F       // White
-    //     -1,  1, -1,     1, 1, 1,    0, 1, 0,    // Index: 20
-    //     -1,  1,  1,     1, 1, 1,    0, 1, 0,    // Index: 21
-    //      1,  1,  1,     1, 1, 1,    0, 1, 0,    // Index: 22
-    //      1,  1, -1,     1, 1, 1,    0, 1, 0     // Index: 23
-    // ];
+    var indicesBox = [
+        0, 1, 2,     0, 2, 3,     // Face A
+        4, 5, 6,     4, 6, 7,     // Face B
+        8, 9, 10,    8, 10, 11,   // Face C
+        12, 13, 14,  12, 14, 15,  // Face D
+        16, 17, 18,  16, 18, 19,  // Face E
+        20, 21, 22,  20, 22, 23,  // Face F     
+    ];
 
-    // var indices = [
-    //     0, 1, 2,     0, 2, 3,     // Face A
-    //     4, 5, 6,     4, 6, 7,     // Face B
-    //     8, 9, 10,    8, 10, 11,   // Face C
-    //     12, 13, 14,  12, 14, 15,  // Face D
-    //     16, 17, 18,  16, 18, 19,  // Face E
-    //     20, 21, 22,  20, 22, 23,  // Face F     
-    // ];
-
-    var vertices = [
+    var verticesJournal = [
         //Paper - Front         //Texture   //Normal vector
-        -0.67, -0.05,  0.97,    1, 1, 1,    0, 0, 1,
-        -0.67,  0.05,  0.97,    1, 1, 1,    0, 0, 1,
-         0.65,  0.05,  0.97,    1, 1, 1,    0, 0, 1,
-         0.65, -0.05,  0.97,    1, 1, 1,    0, 0, 1,
+        -0.67, -0.05,  0.97,    ...white,    0, 0, 1,
+        -0.67,  0.05,  0.97,    ...white,    0, 0, 1,
+         0.65,  0.05,  0.97,    ...white,    0, 0, 1,
+         0.65, -0.05,  0.97,    ...white,    0, 0, 1,
         //Paper - Side
-         0.65, -0.05, -0.97,    1, 1, 1,    1, 0, 0,
-         0.65, -0.05,  0.97,    1, 1, 1,    1, 0, 0,
-         0.65,  0.05,  0.97,    1, 1, 1,    1, 0, 0,
-         0.65,  0.05, -0.97,    1, 1, 1,    1, 0, 0,
+         0.65, -0.05, -0.97,    ...white,    1, 0, 0,
+         0.65, -0.05,  0.97,    ...white,    1, 0, 0,
+         0.65,  0.05,  0.97,    ...white,    1, 0, 0,
+         0.65,  0.05, -0.97,    ...white,    1, 0, 0,
         //Paper - Back
-         0.65, -0.05, -0.97,    1, 1, 1,    0, 0, -1,
-         0.65,  0.05, -0.97,    1, 1, 1,    0, 0, -1,
-        -0.67,  0.05, -0.97,    1, 1, 1,    0, 0, -1,
-        -0.67, -0.05, -0.97,    1, 1, 1,    0, 0, -1,
+         0.65, -0.05, -0.97,    ...white,    0, 0, -1,
+         0.65,  0.05, -0.97,    ...white,    0, 0, -1,
+        -0.67,  0.05, -0.97,    ...white,    0, 0, -1,
+        -0.67, -0.05, -0.97,    ...white,    0, 0, -1,
     
         //Cover - Top - Top
-        -0.67,  0.06,     1,    1, 0, 0,    0, 1, 0,
-         0.67,  0.06,     1,    1, 0, 0,    0, 1, 0,
-         0.67,  0.06,    -1,    1, 0, 0,    0, 1, 0,
-        -0.67,  0.06,    -1,    1, 0, 0,    0, 1, 0,
+        -0.67,  0.06,     1,    ...brown,    0, 1, 0,
+         0.67,  0.06,     1,    ...brown,    0, 1, 0,
+         0.67,  0.06,    -1,    ...brown,    0, 1, 0,
+        -0.67,  0.06,    -1,    ...brown,    0, 1, 0,
         //Cover - Top - Front
-        -0.67,  0.06,     1,    1, 0, 0,    0, 0, 1,
-        -0.67,  0.05,     1,    1, 0, 0,    0, 0, 1,
-         0.67,  0.06,     1,    1, 0, 0,    0, 0, 1,
-         0.67,  0.05,     1,    1, 0, 0,    0, 0, 1,
+        -0.67,  0.06,     1,    ...brown,    0, 0, 1,
+        -0.67,  0.05,     1,    ...brown,    0, 0, 1,
+         0.67,  0.06,     1,    ...brown,    0, 0, 1,
+         0.67,  0.05,     1,    ...brown,    0, 0, 1,
         //Cover - Top - Side
-         0.67,  0.06,     1,    1, 0, 0,    1, 0, 0,
-         0.67,  0.05,     1,    1, 0, 0,    1, 0, 0,
-        -0.67,  0.06,    -1,    1, 0, 0,    1, 0, 0,
-        -0.67,  0.05,    -1,    1, 0, 0,    1, 0, 0,
+         0.67,  0.06,     1,    ...brown,    1, 0, 0,
+         0.67,  0.05,     1,    ...brown,    1, 0, 0,
+        -0.67,  0.06,    -1,    ...brown,    1, 0, 0,
+        -0.67,  0.05,    -1,    ...brown,    1, 0, 0,
         //Cover - Top - Back
-         0.67,  0.06,    -1,    1, 0, 0,    0, 0, -1,
-         0.67,  0.05,    -1,    1, 0, 0,    0, 0, -1,
-        -0.67,  0.06,    -1,    1, 0, 0,    0, 0, -1,
-        -0.67,  0.05,    -1,    1, 0, 0,    0, 0, -1,
+         0.67,  0.06,    -1,    ...brown,    0, 0, -1,
+         0.67,  0.05,    -1,    ...brown,    0, 0, -1,
+        -0.67,  0.06,    -1,    ...brown,    0, 0, -1,
+        -0.67,  0.05,    -1,    ...brown,    0, 0, -1,
         //Cover - Top - Bottom
-        -0.67,  0.05,     1,    1, 0, 0,    0, -1, 0,
-         0.67,  0.05,     1,    1, 0, 0,    0, -1, 0,
-         0.67,  0.05,    -1,    1, 0, 0,    0, -1, 0,
-        -0.67,  0.05,    -1,    1, 0, 0,    0, -1, 0,
+        -0.67,  0.05,     1,    ...brown,    0, -1, 0,
+         0.67,  0.05,     1,    ...brown,    0, -1, 0,
+         0.67,  0.05,    -1,    ...brown,    0, -1, 0,
+        -0.67,  0.05,    -1,    ...brown,    0, -1, 0,
     
         //Cover - Side - Outer Side
-        -0.67, -0.06,     1,    1, 1, 0,   -1, 0, 0,
-        -0.67,  0.06,     1,    1, 1, 0,   -1, 0, 0,
-        -0.67,  0.06,    -1,    1, 1, 0,   -1, 0, 0,
-        -0.67, -0.06,    -1,    1, 1, 0,   -1, 0, 0,
+        -0.67, -0.06,     1,    ...beige,   -1, 0, 0,
+        -0.67,  0.06,     1,    ...beige,   -1, 0, 0,
+        -0.67,  0.06,    -1,    ...beige,   -1, 0, 0,
+        -0.67, -0.06,    -1,    ...beige,   -1, 0, 0,
         //Cover - Side - Front
-        -0.67,  0.06,     1,    1, 1, 0,   0, 0, 1,
-        -0.67, -0.06,     1,    1, 1, 0,   0, 0, 1,
-        -0.66,  0.06,     1,    1, 1, 0,   0, 0, 1,
-        -0.66, -0.06,     1,    1, 1, 0,   0, 0, 1,
+        -0.67,  0.06,     1,    ...beige,   0, 0, 1,
+        -0.67, -0.06,     1,    ...beige,   0, 0, 1,
+        -0.66,  0.06,     1,    ...beige,   0, 0, 1,
+        -0.66, -0.06,     1,    ...beige,   0, 0, 1,
         //Cover - Side - Back
-        -0.67,  0.06,    -1,    1, 1, 0,   0, 0,-1,
-        -0.67, -0.06,    -1,    1, 1, 0,   0, 0,-1,
-        -0.66,  0.06,    -1,    1, 1, 0,   0, 0,-1,
-        -0.66, -0.06,    -1,    1, 1, 0,   0, 0,-1,
+        -0.67,  0.06,    -1,    ...beige,   0, 0,-1,
+        -0.67, -0.06,    -1,    ...beige,   0, 0,-1,
+        -0.66,  0.06,    -1,    ...beige,   0, 0,-1,
+        -0.66, -0.06,    -1,    ...beige,   0, 0,-1,
         //Cover - Side - Inner Side
-        -0.66, -0.06,     1,    1, 1, 0,   1, 0, 0,
-        -0.66,  0.06,     1,    1, 1, 0,   1, 0, 0,
-        -0.66,  0.06,    -1,    1, 1, 0,   1, 0, 0,
-        -0.66, -0.06,    -1,    1, 1, 0,   1, 0, 0,
+        -0.66, -0.06,     1,    ...beige,   1, 0, 0,
+        -0.66,  0.06,     1,    ...beige,   1, 0, 0,
+        -0.66,  0.06,    -1,    ...beige,   1, 0, 0,
+        -0.66, -0.06,    -1,    ...beige,   1, 0, 0,
     
         //Cover - Bottom - Bottom
-        -0.67, -0.06,    -1,    1, 1, 0,   0, -1, 0,
-        -0.67, -0.06,     1,    1, 1, 0,   0, -1, 0,
-         0.67, -0.06,     1,    1, 1, 0,   0, -1, 0,  
-         0.67, -0.06,    -1,    1, 1, 0,   0, -1, 0,
+        -0.67, -0.06,    -1,    ...beige,   0, -1, 0,
+        -0.67, -0.06,     1,    ...beige,   0, -1, 0,
+         0.67, -0.06,     1,    ...beige,   0, -1, 0,  
+         0.67, -0.06,    -1,    ...beige,   0, -1, 0,
         //Cover - Bottom - Front
-        -0.67, -0.06,     1,    1, 1, 0,   0, 0, 1,
-         0.67, -0.06,     1,    1, 1, 0,   0, 0, 1,  
-        -0.67, -0.05,     1,    1, 1, 0,   0, 0, 1,
-         0.67, -0.05,     1,    1, 1, 0,   0, 0, 1, 
+        -0.67, -0.06,     1,    ...beige,   0, 0, 1,
+         0.67, -0.06,     1,    ...beige,   0, 0, 1,  
+        -0.67, -0.05,     1,    ...beige,   0, 0, 1,
+         0.67, -0.05,     1,    ...beige,   0, 0, 1, 
         //Cover - Bottom - Side
-         0.67, -0.06,     1,    1, 1, 0,   1, 0, 0,
-         0.67, -0.06,    -1,    1, 1, 0,   1, 0, 0,
-         0.67, -0.05,     1,    1, 1, 0,   1, 0, 0,
-         0.67, -0.05,    -1,    1, 1, 0,   1, 0, 0,
+         0.67, -0.06,     1,    ...beige,   1, 0, 0,
+         0.67, -0.06,    -1,    ...beige,   1, 0, 0,
+         0.67, -0.05,     1,    ...beige,   1, 0, 0,
+         0.67, -0.05,    -1,    ...beige,   1, 0, 0,
         //Cover - Bottom - Back
-         0.67, -0.06,    -1,    1, 1, 0,   0, 0, -1,
-        -0.67, -0.06,    -1,    1, 1, 0,   0, 0, -1,
-         0.67, -0.05,    -1,    1, 1, 0,   0, 0, -1,
-        -0.67, -0.05,    -1,    1, 1, 0,   0, 0, -1,
+         0.67, -0.06,    -1,    ...beige,   0, 0, -1,
+        -0.67, -0.06,    -1,    ...beige,   0, 0, -1,
+         0.67, -0.05,    -1,    ...beige,   0, 0, -1,
+        -0.67, -0.05,    -1,    ...beige,   0, 0, -1,
         //Cover - Bottom - Top
-        -0.67, -0.05,    -1,    1, 1, 0,   0, -1, 0,
-        -0.67, -0.05,     1,    1, 1, 0,   0, -1, 0,
-         0.67, -0.05,     1,    1, 1, 0,   0, -1, 0,  
-         0.67, -0.05,    -1,    1, 1, 0,   0, -1, 0,
+        -0.67, -0.05,    -1,    ...beige,   0, -1, 0,
+        -0.67, -0.05,     1,    ...beige,   0, -1, 0,
+         0.67, -0.05,     1,    ...beige,   0, -1, 0,  
+         0.67, -0.05,    -1,    ...beige,   0, -1, 0,
     
         //Strap - Side - Outer Side
-         0.68, -0.06, -0.15,    1, 1, 0,   1, 0, 0,
-         0.68, -0.06,  0.15,    1, 1, 0,   1, 0, 0,
-         0.68,  0.07,  0.15,    1, 1, 0,   1, 0, 0,
-         0.68,  0.07, -0.15,    1, 1, 0,   1, 0, 0,
+         0.68, -0.06, -0.15,    ...beige,   1, 0, 0,
+         0.68, -0.06,  0.15,    ...beige,   1, 0, 0,
+         0.68,  0.07,  0.15,    ...beige,   1, 0, 0,
+         0.68,  0.07, -0.15,    ...beige,   1, 0, 0,
         //Strap - Side - Front
-         0.68,  0.07,  0.15,    1, 1, 0,   0, 0, 1,
-         0.68, -0.06,  0.15,    1, 1, 0,   0, 0, 1,
-         0.67,  0.07,  0.15,    1, 1, 0,   0, 0, 1,
-         0.67, -0.06,  0.15,    1, 1, 0,   0, 0, 1,
+         0.68,  0.07,  0.15,    ...beige,   0, 0, 1,
+         0.68, -0.06,  0.15,    ...beige,   0, 0, 1,
+         0.67,  0.07,  0.15,    ...beige,   0, 0, 1,
+         0.67, -0.06,  0.15,    ...beige,   0, 0, 1,
         //Strap - Side - Bottom
-         0.68, -0.06,  0.15,    1, 1, 0,   0, -1, 0,
-         0.68, -0.06, -0.15,    1, 1, 0,   0, -1, 0,
-         0.67, -0.06,  0.15,    1, 1, 0,   0, -1, 0,
-         0.67, -0.06, -0.15,    1, 1, 0,   0, -1, 0,
+         0.68, -0.06,  0.15,    ...beige,   0, -1, 0,
+         0.68, -0.06, -0.15,    ...beige,   0, -1, 0,
+         0.67, -0.06,  0.15,    ...beige,   0, -1, 0,
+         0.67, -0.06, -0.15,    ...beige,   0, -1, 0,
         //Strap - Side - Back
-         0.68, -0.06, -0.15,    1, 1, 0,   0, 0, -1,
-         0.68,  0.07, -0.15,    1, 1, 0,   0, 0, -1,
-         0.67, -0.06, -0.15,    1, 1, 0,   0, 0, -1,
-         0.67,  0.07, -0.15,    1, 1, 0,   0, 0, -1,
+         0.68, -0.06, -0.15,    ...beige,   0, 0, -1,
+         0.68,  0.07, -0.15,    ...beige,   0, 0, -1,
+         0.67, -0.06, -0.15,    ...beige,   0, 0, -1,
+         0.67,  0.07, -0.15,    ...beige,   0, 0, -1,
          //Strap - Side - Inner Side
-         0.67, -0.06, -0.15,    1, 1, 0,   1, 0, 0,
-         0.67, -0.06,  0.15,    1, 1, 0,   1, 0, 0,
-         0.67,  0.07,  0.15,    1, 1, 0,   1, 0, 0,
-         0.67,  0.07, -0.15,    1, 1, 0,   1, 0, 0,
+         0.67, -0.06, -0.15,    ...beige,   1, 0, 0,
+         0.67, -0.06,  0.15,    ...beige,   1, 0, 0,
+         0.67,  0.07,  0.15,    ...beige,   1, 0, 0,
+         0.67,  0.07, -0.15,    ...beige,   1, 0, 0,
         
         //Strap - Top - Top
-         0.68,  0.07, -0.15,    1, 1, 0,   0, 1, 0,
-         0.68,  0.07,  0.15,    1, 1, 0,   0, 1, 0,
-         0.31,  0.07,  0.15,    1, 1, 0,   0, 1, 0,
-         0.31,  0.07, -0.15,    1, 1, 0,   0, 1, 0,
+         0.68,  0.07, -0.15,    ...beige,   0, 1, 0,
+         0.68,  0.07,  0.15,    ...beige,   0, 1, 0,
+         0.31,  0.07,  0.15,    ...beige,   0, 1, 0,
+         0.31,  0.07, -0.15,    ...beige,   0, 1, 0,
         //Strap - Top - Front
-         0.68,  0.07,  0.15,    1, 1, 0,   0, 0, 1,
-         0.31,  0.07,  0.15,    1, 1, 0,   0, 0, 1,
-         0.68,  0.06,  0.15,    1, 1, 0,   0, 0, 1,
-         0.31,  0.06,  0.15,    1, 1, 0,   0, 0, 1,
+         0.68,  0.07,  0.15,    ...beige,   0, 0, 1,
+         0.31,  0.07,  0.15,    ...beige,   0, 0, 1,
+         0.68,  0.06,  0.15,    ...beige,   0, 0, 1,
+         0.31,  0.06,  0.15,    ...beige,   0, 0, 1,
         //Strap - Top - Back
-         0.68,  0.07, -0.15,    1, 1, 0,   0, 0, -1,
-         0.31,  0.07, -0.15,    1, 1, 0,   0, 0, -1,
-         0.68,  0.06, -0.15,    1, 1, 0,   0, 0, -1,
-         0.31,  0.06, -0.15,    1, 1, 0,   0, 0, -1
+         0.68,  0.07, -0.15,    ...beige,   0, 0, -1,
+         0.31,  0.07, -0.15,    ...beige,   0, 0, -1,
+         0.68,  0.06, -0.15,    ...beige,   0, 0, -1,
+         0.31,  0.06, -0.15,    ...beige,   0, 0, -1
     ];
     
-    var indices = [
+    var indicesJournal = [
         //Paper
         0, 1, 2,    0, 2, 3, //Front
         4, 5, 6,    4, 6, 7, //Side
@@ -219,6 +228,13 @@ function main() {
         96, 97, 98,  96, 98, 99 //Back
     ];
 
+    var vertices = verticesJournal.concat(verticesBox);
+    indicesBox.forEach((v, i, arr) => {
+        arr[i] += verticesJournal.length/9;
+    });
+    var indices = indicesJournal.concat(indicesBox);
+    console.log(vertices);
+    
     // Create a linked-list for storing the vertices data
     var vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -361,7 +377,7 @@ function main() {
 
     // Set the view matrix in the vertex shader
     var view = glMatrix.mat4.create();
-    var camera = [0, 0, 4];
+    var camera = [0, 0, 3.5];
     var cameraTarget = [0, 0, 0];
     glMatrix.mat4.lookAt(
         view,
@@ -375,19 +391,19 @@ function main() {
     var uLightConstant = gl.getUniformLocation(shaderProgram, "uLightConstant");
     var uAmbientIntensity = gl.getUniformLocation(shaderProgram, "uAmbientIntensity");
     gl.uniform3fv(uLightConstant, [1.0, 1.0, 1.0]);   // orange light
-    gl.uniform1f(uAmbientIntensity, 0.5) // light intensity: 40%]
+     // light intensity: 40%
 
+    var lightDeltaY = 0.0;
+    var cameraDeltaX = 0.0;
+    var lightPosition = [0, 0, 0];
 
     var uNormalModel = gl.getUniformLocation(shaderProgram, "uNormalModel");
     var uViewerPosition = gl.getUniformLocation(shaderProgram, "uViewerPosition");
     gl.uniform3fv(uViewerPosition, camera);
     var uShininessConstant = gl.getUniformLocation(shaderProgram, "uShininessConstant");
+    var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
 
-    var freeze = false;
-    var lightDeltaY = 0.0;
-    var cameraDeltaX = 0.0;
-    var lightPosition = [0, 0, 0];
-    // Apply some interaction using keyboard
+    // Keyboard control
     function onKeydown(event) {
         if (event.keyCode == 87) lightDeltaY = 0.01;
         else if (event.keyCode == 83) lightDeltaY = -0.01;
@@ -403,77 +419,79 @@ function main() {
     document.addEventListener("keydown", onKeydown, false);
     document.addEventListener("keyup", onKeyup, false);
 
-    var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
-
-    var speed = [3/600, 2/600, 0];
-    var change = [0, 0, 0];
-
+    // Utility degree to radian function
     function degToRad(degrees) {
         return degrees * (Math.PI/180);
     }
 
-    // Tranformation model matrix for right object
+    // Model for cube
+    var modelCube = glMatrix.mat4.create();
+    var normalModelCube = glMatrix.mat4.create();
+    glMatrix.mat3.normalFromMat4(normalModelCube, modelCube);
+    var cubeTranslation = [0, 0, 0];
+
+    // Model and normal model for right object
     var modelRight = glMatrix.mat4.create();
     glMatrix.mat4.rotate(modelRight, modelRight, degToRad(270), [0, 1, 0]);
     glMatrix.mat4.rotate(modelRight, modelRight, degToRad(330), [0, 0, 1]);
     glMatrix.mat4.translate(modelRight, modelRight, [0, 0, -1]);
-    // Normal model matrix for right object
     var normalModelRight = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelRight, modelRight);
 
-    // Tranformation model matrix for left object
+    // Model and normal model for left object
     var modelLeft = glMatrix.mat4.create();
     glMatrix.mat4.rotate(modelLeft, modelLeft, degToRad(30), [1, 0, 0]);
     glMatrix.mat4.rotate(modelLeft, modelLeft, degToRad(0), [0, 0, 1]);
-    glMatrix.mat4.translate(modelLeft, modelLeft, [-1, 0, 0]);
-    // Normal model matrix for right object
+    glMatrix.mat4.translate(modelLeft, modelLeft, [-0.78, 0, 0]);
     var normalModelLeft = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelLeft, modelLeft);
 
     function render() {
-    
-        if (change[0] >= 0.5 || change[0] <= -0.5) speed[0] = -speed[0];
-        if (change[1] >= 0.5 || change[1] <= -0.5) speed[1] = -speed[1];
-        change[0] = change[0] + speed[0];
-        change[1] = change[1] + speed[1];
-
+        
+        // Update light position
         lightPosition[1] += lightDeltaY;
         gl.uniform3fv(uLightPosition, lightPosition);
 
+        // Update camera position
         camera[0] += cameraDeltaX;
         cameraTarget[0] += cameraDeltaX;
         glMatrix.mat4.lookAt(
             view,
-            camera,      // camera position
-            cameraTarget,      // the point where camera looks at
-            [0, 1, 0]       // up vector of the camera
+            camera,
+            cameraTarget,
+            [0, 1, 0]
         );
         gl.uniformMatrix4fv(uView, false, view);
+        gl.uniform3fv(uViewerPosition, camera);
         
-        // Set the model matrix in the vertex shader
-        gl.uniformMatrix4fv(uModel, false, modelRight);
-
-        // Set the model matrix for normal vector
-        gl.uniformMatrix3fv(uNormalModel, false, normalModelRight);
-
-        gl.uniform1f(uShininessConstant, 2);
+        // Update cube position
+        cubeTranslation[1] = lightDeltaY;
+        glMatrix.mat4.translate(modelCube, modelCube, cubeTranslation);
 
         // Reset the frame buffer
         gl.enable(gl.DEPTH_TEST);
-        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.clearColor(...creme, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+        
+        // Draw right journal
+        gl.uniformMatrix4fv(uModel, false, modelRight);
+        gl.uniformMatrix3fv(uNormalModel, false, normalModelRight);
+        gl.uniform1f(uShininessConstant, 500);
+        gl.uniform1f(uAmbientIntensity, 0.340)        
+        gl.drawElements(gl.TRIANGLES, indicesJournal.length, gl.UNSIGNED_SHORT, 0);
 
-        // Set the model matrix in the vertex shader
+        // Draw left journal
         gl.uniformMatrix4fv(uModel, false, modelLeft);
-
-        gl.uniform1f(uShininessConstant, 100);
-
-        // Set the model matrix for normal vector
-        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.uniform1f(uShininessConstant, 5);
         gl.uniformMatrix3fv(uNormalModel, false, normalModelLeft);
-
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.uniform1f(uAmbientIntensity, 0.340)
+        gl.drawElements(gl.TRIANGLES, indicesJournal.length, gl.UNSIGNED_SHORT, 0);
+        
+        // Draw the cube
+        gl.uniformMatrix4fv(uModel, false, modelCube);
+        gl.uniformMatrix3fv(uNormalModel, false, normalModelCube);
+        gl.uniform1f(uAmbientIntensity, 1.0)
+        gl.drawElements(gl.TRIANGLES, indicesBox.length, gl.UNSIGNED_SHORT, indicesJournal.length * Uint16Array.BYTES_PER_ELEMENT);
     
         requestAnimationFrame(render);
     }
