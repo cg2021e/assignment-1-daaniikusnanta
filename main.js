@@ -362,10 +362,11 @@ function main() {
     // Set the view matrix in the vertex shader
     var view = glMatrix.mat4.create();
     var camera = [0, 0, 4];
+    var cameraTarget = [0, 0, 0];
     glMatrix.mat4.lookAt(
         view,
         camera,      // camera position
-        [0, 0, 0],      // the point where camera looks at
+        cameraTarget,      // the point where camera looks at
         [0, 1, 0]       // up vector of the camera
     );
     gl.uniformMatrix4fv(uView, false, view);
@@ -374,31 +375,35 @@ function main() {
     var uLightConstant = gl.getUniformLocation(shaderProgram, "uLightConstant");
     var uAmbientIntensity = gl.getUniformLocation(shaderProgram, "uAmbientIntensity");
     gl.uniform3fv(uLightConstant, [1.0, 1.0, 1.0]);   // orange light
-    gl.uniform1f(uAmbientIntensity, 0.5) // light intensity: 40%
-    // var uLightDirection = gl.getUniformLocation(shaderProgram, "uLightDirection");
-    // gl.uniform3fv(uLightDirection, [2.0, 0.0, 0.0]);    // light comes from the right side
-    var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
-    gl.uniform3fv(uLightPosition, [0.0, 0.3, 0.0]);
+    gl.uniform1f(uAmbientIntensity, 0.5) // light intensity: 40%]
+
+
     var uNormalModel = gl.getUniformLocation(shaderProgram, "uNormalModel");
     var uViewerPosition = gl.getUniformLocation(shaderProgram, "uViewerPosition");
     gl.uniform3fv(uViewerPosition, camera);
     var uShininessConstant = gl.getUniformLocation(shaderProgram, "uShininessConstant");
 
     var freeze = false;
-    // Apply some interaction using mouse
-    function onMouseClick(event) {
-        freeze = !freeze;
-    }
-    document.addEventListener("click", onMouseClick, false);
+    var lightDeltaY = 0.0;
+    var cameraDeltaX = 0.0;
+    var lightPosition = [0, 0, 0];
     // Apply some interaction using keyboard
     function onKeydown(event) {
-        if (event.keyCode == 32) freeze = true;
+        if (event.keyCode == 87) lightDeltaY = 0.01;
+        else if (event.keyCode == 83) lightDeltaY = -0.01;
+        else if (event.keyCode == 65) cameraDeltaX = -0.01;
+        else if (event.keyCode == 68) cameraDeltaX = 0.01;
     }
     function onKeyup(event) {
-        if (event.keyCode == 32) freeze = false;
+        if (event.keyCode == 87) lightDeltaY = 0.0;
+        else if (event.keyCode == 83) lightDeltaY = 0.0;
+        else if (event.keyCode == 65) cameraDeltaX = 0.0;
+        else if (event.keyCode == 68) cameraDeltaX = 0.0;
     }
     document.addEventListener("keydown", onKeydown, false);
     document.addEventListener("keyup", onKeyup, false);
+
+    var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
 
     var speed = [3/600, 2/600, 0];
     var change = [0, 0, 0];
@@ -431,6 +436,19 @@ function main() {
         if (change[1] >= 0.5 || change[1] <= -0.5) speed[1] = -speed[1];
         change[0] = change[0] + speed[0];
         change[1] = change[1] + speed[1];
+
+        lightPosition[1] += lightDeltaY;
+        gl.uniform3fv(uLightPosition, lightPosition);
+
+        camera[0] += cameraDeltaX;
+        cameraTarget[0] += cameraDeltaX;
+        glMatrix.mat4.lookAt(
+            view,
+            camera,      // camera position
+            cameraTarget,      // the point where camera looks at
+            [0, 1, 0]       // up vector of the camera
+        );
+        gl.uniformMatrix4fv(uView, false, view);
         
         // Set the model matrix in the vertex shader
         gl.uniformMatrix4fv(uModel, false, modelRight);
