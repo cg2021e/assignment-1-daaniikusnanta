@@ -252,14 +252,14 @@ function main() {
          0.31,  0.06, -0.15,    ...beige,   ...normalVector([0.24,  0.07, -0.14], [0.31,  0.07, -0.15], [0.24,  0.06, -0.14]), // Index 141
 
         // Cover - Top - Accent
-        -0.67,  0.065,     0.01,    ...beige,   0, 1, 0,     //142
-        -0.67,  0.065,   1.0,    ...beige,   0, 1, 0,        //143 
-        -0.22,  0.065,   1.0,    ...beige,   0, 1, 0,        //144
-        -0.15,  0.065,  0.50,    ...beige,   0, 1, 0,        //145
-        -0.12,  0.065,     0.01,    ...beige,   0, 1, 0,     //146
-        -0.15,  0.065, -0.50,    ...beige,   0, 1, 0,        //147
-        -0.22,  0.065,  -1.0,    ...beige,   0, 1, 0,        //148
-        -0.67,  0.065,  -1.0,    ...beige,   0, 1, 0         //149
+        -0.67,  0.0601,     0.01,    ...beige,   0, 1, 0,     //142
+        -0.67,  0.0601,   1.0,    ...beige,   0, 1, 0,        //143 
+        -0.22,  0.0601,   1.0,    ...beige,   0, 1, 0,        //144
+        -0.15,  0.0601,  0.50,    ...beige,   0, 1, 0,        //145
+        -0.12,  0.0601,     0.01,    ...beige,   0, 1, 0,     //146
+        -0.15,  0.0601, -0.50,    ...beige,   0, 1, 0,        //147
+        -0.22,  0.0601,  -1.0,    ...beige,   0, 1, 0,        //148
+        -0.67,  0.0601,  -1.0,    ...beige,   0, 1, 0         //149
     ];
     
     var indicesJournal = [
@@ -484,8 +484,7 @@ function main() {
     // Define the lighting and shading
     var uLightConstant = gl.getUniformLocation(shaderProgram, "uLightConstant");
     var uAmbientIntensity = gl.getUniformLocation(shaderProgram, "uAmbientIntensity");
-    gl.uniform3fv(uLightConstant, [1.0, 1.0, 1.0]);   // orange light
-     // light intensity: 40%
+    gl.uniform3fv(uLightConstant, [1.0, 1.0, 1.0]);
 
     var lightDeltaY = 0.0;
     var cameraDeltaX = 0.0;
@@ -570,15 +569,15 @@ function main() {
         // Draw right journal
         gl.uniformMatrix4fv(uModel, false, modelRight);
         gl.uniformMatrix3fv(uNormalModel, false, normalModelRight);
-        gl.uniform1f(uShininessConstant, 500);
-        gl.uniform1f(uAmbientIntensity, 0.340)        
+        gl.uniform1f(uShininessConstant, 600);   //Plastic
+        gl.uniform1f(uAmbientIntensity, 0.363)        
         gl.drawElements(gl.TRIANGLES, indicesJournal.length, gl.UNSIGNED_SHORT, 0);
 
         // Draw left journal
         gl.uniformMatrix4fv(uModel, false, modelLeft);
-        gl.uniform1f(uShininessConstant, 5);
+        gl.uniform1f(uShininessConstant, 5);    //Metal
         gl.uniformMatrix3fv(uNormalModel, false, normalModelLeft);
-        gl.uniform1f(uAmbientIntensity, 0.340)
+        gl.uniform1f(uAmbientIntensity, 0.363)
         gl.drawElements(gl.TRIANGLES, indicesJournal.length, gl.UNSIGNED_SHORT, 0);
         
         // Draw the cube
