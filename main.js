@@ -166,7 +166,8 @@ function main() {
 
     // Set the view matrix in the vertex shader
     var view = glMatrix.mat4.create();
-    var camera = [0, 0, 2];
+    var camera = glMatrix.vec3.fromValues(0, 0, 2);
+    console.log(camera);
     var cameraTarget = [0, 0, 0];
     glMatrix.mat4.lookAt(
         view,
@@ -195,11 +196,32 @@ function main() {
 
     var lightOn = true;
     var cubeAmbientIntensity = 1.0;
+    var cubeDeltaZ = 0.0;
+    var cubeDeltaX = 0.0;
+    var cameraDeltaZoom = 1.0;
+    var cameraRotationTheta = 0;
     function onKeydown(event) {
-        if (event.keyCode == 32) {
-            lightOn = !lightOn;
-        }
+        if (event.keyCode == 32) lightOn = !lightOn; //Space
+        if (event.keyCode == 87) cubeDeltaZ = -0.01;//W
+        if (event.keyCode == 83) cubeDeltaZ =  0.01;//S
+        if (event.keyCode == 65) cubeDeltaX = -0.01;//A
+        if (event.keyCode == 68) cubeDeltaX =  0.01;//D
+        if (event.keyCode == 38) cameraDeltaZoom = 0.99;//Up
+        if (event.keyCode == 40) cameraDeltaZoom =  1.01;//Down
+        if (event.keyCode == 39) cameraRotationTheta = 1.0;//Left
+        if (event.keyCode == 37) cameraRotationTheta = -1.0;//Right
     }
+    function onKeyup(event) {
+        if (event.keyCode == 87) cubeDeltaZ = 0.0;//W
+        if (event.keyCode == 83) cubeDeltaZ =  0.0;//S
+        if (event.keyCode == 65) cubeDeltaX = 0.0;//A
+        if (event.keyCode == 68) cubeDeltaX =  0.0;//D
+        if (event.keyCode == 38) cameraDeltaZoom = 1.0;//Up
+        if (event.keyCode == 40) cameraDeltaZoom =  1.0;//Down
+        if (event.keyCode == 39) cameraRotationTheta = 0.0;//Left
+        if (event.keyCode == 37) cameraRotationTheta = 0.0;//Right
+    }
+    document.addEventListener("keyup", onKeyup, false);
     document.addEventListener("keydown", onKeydown, false);
 
     // Model for cube
@@ -229,7 +251,7 @@ function main() {
     var normalModelPlane = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelPlane, modelPlane);
 
-    function updateLight(lightOn) {
+    function updateLight() {
         if(lightOn) {
             gl.uniform1f(uDiffuseSwitch, 1.0);
             gl.uniform1f(uSpecularSwitch, 1.0);
@@ -239,7 +261,25 @@ function main() {
             gl.uniform1f(uSpecularSwitch, 0.0);
             cubeAmbientIntensity = 0.0;
         }
+        lightPosition[0] += cubeDeltaX;
+        lightPosition[2] += cubeDeltaZ;
+        gl.uniform3fv(uLightPosition, lightPosition)
     }
+
+    function updateCamera() {
+        camera[0] *= cameraDeltaZoom;
+        camera[2] *= cameraDeltaZoom;
+        glMatrix.vec3.rotateY(camera, camera, [0, 0, 0], degToRad(cameraRotationTheta));
+        console.log(camera);
+        glMatrix.mat4.lookAt(
+            view,
+            camera,      // camera position
+            cameraTarget,      // the point where camera looks at
+            [0, 1, 0]       // up vector of the camera
+        );
+        gl.uniformMatrix4fv(uView, false, view);
+    }
+
 
     function render() {
         
@@ -255,7 +295,8 @@ function main() {
         gl.clearColor(...creme, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        updateLight(lightOn);
+        updateLight();
+        updateCamera();
 
         // Draw right journal
         gl.uniformMatrix4fv(uModel, false, modelRight);
@@ -265,6 +306,8 @@ function main() {
         gl.drawElements(gl.TRIANGLES, indicesJournal.length, gl.UNSIGNED_SHORT, 0);
 
         // Draw left journal
+        glMatrix.mat4.translate(modelCube, modelCube, [cubeDeltaX, 0, cubeDeltaZ]);
+
         gl.uniformMatrix4fv(uModel, false, modelLeft);
         gl.uniform1f(uShininessConstant, 10);    //lPlastic
         gl.uniformMatrix3fv(uNormalModel, false, normalModelLeft);
