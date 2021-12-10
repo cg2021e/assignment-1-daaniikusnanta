@@ -1,5 +1,5 @@
 import { white, beige, brown } from "./colors.js";
-import { normalVector } from "./utils.js";
+import { normalVector, hexToColor } from "./utils.js";
 
 // Define vertices data consisting of position and color properties
 var verticesBox = [
@@ -300,4 +300,15 @@ var indicesJournal = [
     142, 147, 148,  142, 148, 149
 ];
 
-export {verticesBox, indicesBox, verticesJournal, indicesJournal};
+var verticesPlane = [
+     10, 0, 10,      ...hexToColor("163163"),   0, 1, 0,
+     10, 0,-10,      ...hexToColor("163163"),   0, 1, 0, 
+    -10, 0,-10,      ...hexToColor("163163"),   0, 1, 0,
+    -10, 0, 10,      ...hexToColor("163163"),   0, 1, 0
+]
+
+var indicesPlane = [
+    0, 1, 2,   0, 2, 3
+]
+
+export {verticesBox, indicesBox, verticesJournal, indicesJournal, verticesPlane, indicesPlane};

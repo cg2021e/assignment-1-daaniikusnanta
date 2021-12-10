@@ -16,6 +16,16 @@ export function color(r, g, b) {
 //     return [r/255, g/255, b/255];
 // }
 
+export function hexToColor(hex) {
+    var rHex = hex.substring(0, 2);
+    var gHex = hex.substring(2, 4);
+    var bHex = hex.substring(4, 6);
+    var r = parseInt(rHex, 16);
+    var g = parseInt(gHex, 16);
+    var b = parseInt(gHex, 16);
+    return color(r, g, b);
+}
+
 export function degToRad(degrees) {
     return degrees * (Math.PI/180);
 }

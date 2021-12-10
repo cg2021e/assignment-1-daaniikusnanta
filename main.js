@@ -1,6 +1,6 @@
 import { degToRad } from './utils.js';
 import { creme } from './colors.js';
-import { verticesBox, indicesBox, verticesJournal, indicesJournal} from './vertices-and-indices.js';
+import { verticesBox, indicesBox, verticesJournal, indicesJournal, verticesPlane, indicesPlane } from './vertices-and-indices.js';
 
 function main() {
     //Access the canvas through DOM: Document Object Model
@@ -14,7 +14,12 @@ function main() {
         arr[i] += verticesJournal.length/9;
     });
     var indices = indicesJournal.concat(indicesBox);
-    console.log(verticesJournal.length/9);
+
+    indicesPlane.forEach((v, i, arr) => {
+        arr[i] += vertices.length/9;
+    });
+    vertices = vertices.concat(verticesPlane);
+    indices = indices.concat(indicesPlane);
     
     // Create a linked-list for storing the vertices data
     var vertexBuffer = gl.createBuffer();
@@ -202,6 +207,13 @@ function main() {
     glMatrix.mat4.translate(modelLeft, modelLeft, [-0.7, 0, 0]);
     var normalModelLeft = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelLeft, modelLeft);
+    
+    
+    var modelPlane = glMatrix.mat4.create();
+    glMatrix.mat4.rotate(modelPlane, modelPlane, degToRad(0), [0, 0, 0]);
+    glMatrix.mat4.translate(modelPlane, modelPlane, [0, -0.561, 0]);
+    var normalModelPlane = glMatrix.mat3.create();
+    glMatrix.mat3.normalFromMat4(normalModelPlane, modelPlane);
 
     function render() {
         
@@ -236,7 +248,10 @@ function main() {
         gl.uniformMatrix3fv(uNormalModel, false, normalModelCube);
         gl.uniform1f(uAmbientIntensity, 1.0)
         gl.drawElements(gl.TRIANGLES, indicesBox.length, gl.UNSIGNED_SHORT, indicesJournal.length * Uint16Array.BYTES_PER_ELEMENT);
-    
+        
+        gl.uniformMatrix4fv(uModel, false, modelPlane);
+        gl.uniformMatrix3fv(uNormalModel, false, normalModelPlane);
+        gl.drawElements(gl.TRIANGLES, indicesPlane.length, gl.UNSIGNED_SHORT, (indicesJournal.length + indicesBox.length) * Uint16Array.BYTES_PER_ELEMENT);
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
