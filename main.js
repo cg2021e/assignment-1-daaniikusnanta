@@ -174,8 +174,6 @@ function main() {
     var uAmbientIntensity = gl.getUniformLocation(shaderProgram, "uAmbientIntensity");
     gl.uniform3fv(uLightConstant, [1.0, 1.0, 1.0]);
 
-    var lightDeltaY = 0.0;
-    var cameraDeltaX = 0.0;
     var lightPosition = [0, 0, 0];
 
     var uNormalModel = gl.getUniformLocation(shaderProgram, "uNormalModel");
@@ -184,28 +182,10 @@ function main() {
     var uShininessConstant = gl.getUniformLocation(shaderProgram, "uShininessConstant");
     var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
 
-    // Keyboard control
-    function onKeydown(event) {
-        if (event.keyCode == 87) lightDeltaY = 0.01;
-        else if (event.keyCode == 83) lightDeltaY = -0.01;
-        else if (event.keyCode == 65) cameraDeltaX = -0.01;
-        else if (event.keyCode == 68) cameraDeltaX = 0.01;
-    }
-
-    function onKeyup(event) {
-        if (event.keyCode == 87) lightDeltaY = 0.0;
-        else if (event.keyCode == 83) lightDeltaY = 0.0;
-        else if (event.keyCode == 65) cameraDeltaX = 0.0;
-        else if (event.keyCode == 68) cameraDeltaX = 0.0;
-    }
-    document.addEventListener("keydown", onKeydown, false);
-    document.addEventListener("keyup", onKeyup, false);
-
     // Model for cube
     var modelCube = glMatrix.mat4.create();
     var normalModelCube = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelCube, modelCube);
-    var cubeTranslation = [0, 0, 0];
 
     // Model and normal model for right object
     var modelRight = glMatrix.mat4.create();
@@ -226,24 +206,11 @@ function main() {
     function render() {
         
         // Update light position
-        lightPosition[1] += lightDeltaY;
         gl.uniform3fv(uLightPosition, lightPosition);
 
         // Update camera position
-        camera[0] += cameraDeltaX;
-        cameraTarget[0] += cameraDeltaX;
-        glMatrix.mat4.lookAt(
-            view,
-            camera,
-            cameraTarget,
-            [0, 1, 0]
-        );
         gl.uniformMatrix4fv(uView, false, view);
         gl.uniform3fv(uViewerPosition, camera);
-        
-        // Update cube position
-        cubeTranslation[1] = lightDeltaY;
-        glMatrix.mat4.translate(modelCube, modelCube, cubeTranslation);
 
         // Reset the frame buffer
         gl.enable(gl.DEPTH_TEST);
