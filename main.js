@@ -61,6 +61,8 @@ function main() {
         uniform mat3 uNormalModel;
         uniform vec3 uViewerPosition;
         uniform float uShininessConstant;
+        uniform float uDiffuseSwitch;
+        uniform float uSpecularSwitch;
         void main() {
             vec3 ambient = uLightConstant * uAmbientIntensity;
             // vec3 lightDirection = uLightDirection;
@@ -83,7 +85,7 @@ function main() {
                 float specularIntensity = pow(cosPhi, shininessConstant); 
                 specular = uLightConstant * specularIntensity;
             }
-            vec3 phong = ambient + diffuse + specular;
+            vec3 phong = ambient + (diffuse * uDiffuseSwitch) + (specular * uSpecularSwitch);
             gl_FragColor = vec4(phong * vColor, 1.);
         }
     `;
@@ -186,6 +188,19 @@ function main() {
     gl.uniform3fv(uViewerPosition, camera);
     var uShininessConstant = gl.getUniformLocation(shaderProgram, "uShininessConstant");
     var uLightPosition = gl.getUniformLocation(shaderProgram, "uLightPosition");
+    var uDiffuseSwitch = gl.getUniformLocation(shaderProgram, "uDiffuseSwitch");
+    var uSpecularSwitch = gl.getUniformLocation(shaderProgram, "uSpecularSwitch");
+    gl.uniform1f(uDiffuseSwitch, 1.0);
+    gl.uniform1f(uSpecularSwitch, 1.0);
+
+    var lightOn = true;
+    var cubeAmbientIntensity = 1.0;
+    function onKeydown(event) {
+        if (event.keyCode == 32) {
+            lightOn = !lightOn;
+        }
+    }
+    document.addEventListener("keydown", onKeydown, false);
 
     // Model for cube
     var modelCube = glMatrix.mat4.create();
@@ -208,12 +223,23 @@ function main() {
     var normalModelLeft = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelLeft, modelLeft);
     
-    
     var modelPlane = glMatrix.mat4.create();
     glMatrix.mat4.rotate(modelPlane, modelPlane, degToRad(0), [0, 0, 0]);
     glMatrix.mat4.translate(modelPlane, modelPlane, [0, -0.561, 0]);
     var normalModelPlane = glMatrix.mat3.create();
     glMatrix.mat3.normalFromMat4(normalModelPlane, modelPlane);
+
+    function updateLight(lightOn) {
+        if(lightOn) {
+            gl.uniform1f(uDiffuseSwitch, 1.0);
+            gl.uniform1f(uSpecularSwitch, 1.0);
+            cubeAmbientIntensity = 1.0;
+        } else {
+            gl.uniform1f(uDiffuseSwitch, 0.0);
+            gl.uniform1f(uSpecularSwitch, 0.0);
+            cubeAmbientIntensity = 0.0;
+        }
+    }
 
     function render() {
         
@@ -229,6 +255,8 @@ function main() {
         gl.clearColor(...creme, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
+        updateLight(lightOn);
+
         // Draw right journal
         gl.uniformMatrix4fv(uModel, false, modelRight);
         gl.uniformMatrix3fv(uNormalModel, false, normalModelRight);
@@ -246,11 +274,12 @@ function main() {
         // Draw the cube
         gl.uniformMatrix4fv(uModel, false, modelCube);
         gl.uniformMatrix3fv(uNormalModel, false, normalModelCube);
-        gl.uniform1f(uAmbientIntensity, 1.0)
+        gl.uniform1f(uAmbientIntensity, cubeAmbientIntensity)
         gl.drawElements(gl.TRIANGLES, indicesBox.length, gl.UNSIGNED_SHORT, indicesJournal.length * Uint16Array.BYTES_PER_ELEMENT);
         
         gl.uniformMatrix4fv(uModel, false, modelPlane);
         gl.uniformMatrix3fv(uNormalModel, false, normalModelPlane);
+        gl.uniform1f(uAmbientIntensity, 0.5)
         gl.drawElements(gl.TRIANGLES, indicesPlane.length, gl.UNSIGNED_SHORT, (indicesJournal.length + indicesBox.length) * Uint16Array.BYTES_PER_ELEMENT);
         requestAnimationFrame(render);
     }
